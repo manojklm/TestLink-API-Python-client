@@ -18,8 +18,10 @@
 # ------------------------------------------------------------------------
 
 import sys
+import base64
 if sys.version_info[0] < 3:
     import xmlrpclib
+    base64.encodebytes = base64.encodestring
 else:
     import xmlrpc.client as xmlrpclib
 from . import testlinkerrors
@@ -1234,11 +1236,10 @@ TL version >= 1.9.11
             ATTACHMENTFILE via the api to into TL
             ATTACHMENTFILE: python file descriptor pointing to the file """
         import mimetypes
-        import base64
         import os.path
-        return {'filename':os.path.basename(attachmentfile.name),
-                'filetype':mimetypes.guess_type(attachmentfile.name)[0],
-                'content':base64.encodestring(attachmentfile.read())
+        return {'filename': os.path.basename(attachmentfile.name),
+                'filetype': mimetypes.guess_type(attachmentfile.name)[0],
+                'content': base64.encodebytes(attachmentfile.read())
                 }
 
     

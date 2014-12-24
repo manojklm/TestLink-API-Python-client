@@ -22,6 +22,11 @@
 
 import sys, os.path
 
+if sys.version_info[0] == 3:
+    BINARY_READ_MODE = 'rb'
+else:
+    BINARY_READ_MODE = 'r'
+
 if sys.version_info[0] == 2 and sys.version_info[1] == 6:
     # py26 needs backport unittest2
     import unittest2 as unittest
@@ -674,15 +679,12 @@ class TestLinkAPIGenericOfflineTestCase(unittest.TestCase):
         # see http://docs.python.org/2/tutorial/inputoutput.html#reading-and-writing-files
         # under py3, text files open with 'r' on windows makes problem
         # see https://github.com/lczub/TestLink-API-Python-client/issues/39
-        a_file=open(NEWATTACHMENT_PY)
+        a_file = open(NEWATTACHMENT_PY, BINARY_READ_MODE)
         args = self.api._getAttachmentArgs(a_file)
         self.assertEqual('testlinkapigeneric_offline_test.py', args['filename'])
-        self.assertEqual('text/plain', args['filetype'])
-        self.assertIsNotNone(args['content'])
-       
+        if sys.version_info[0] == 2 and sys.version_info[1] == 6:
+            self.assertEqual('text/x-python', args['filetype'])
+        else:
+            self.assertEqual('text/plain', args['filetype'])
 
-        
-               
-if __name__ == "__main__":
-    #import sys;sys.argv = ['', 'Test.testName']
-    unittest.main()
+        self.assertIsNotNone(args['content'])
